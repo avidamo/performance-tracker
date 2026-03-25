@@ -68,15 +68,27 @@ function buildFallbackSummary(snapshot: Snapshot) {
     .filter(Boolean)
     .join(' ')
 
-  const nextFocus = [
-    ...inProgressGoals.slice(0, 2),
-    ...softSkillFocus.slice(0, 2),
-    ...(snapshot.analytics?.warnings ?? []).slice(0, 2),
-  ]
-    .filter(Boolean)
-    .join('; ') || 'Clarify next-month priorities with manager.'
+  const nextFocus =
+    [
+      ...inProgressGoals.slice(0, 2),
+      ...softSkillFocus.slice(0, 2),
+      ...(snapshot.analytics?.warnings ?? []).slice(0, 2),
+    ]
+      .filter(Boolean)
+      .join('; ') || 'Clarify next-month priorities with manager.'
 
-  const summary = `${snapshot.employee.name} showed month-over-month progress as a ${snapshot.employee.role_title}. ${analyticsLine ? `${analyticsLine}. ` : ''}${topAchievements.length ? `Standout wins included ${topAchievements.join(', ')}.` : 'The month would benefit from more logged achievements.'} ${inProgressGoals.length ? `Primary active focus areas remain ${inProgressGoals.slice(0, 3).join(', ')}.` : ''}`.trim()
+  const summary =
+    `${snapshot.employee.name} showed month-over-month progress as a ${snapshot.employee.role_title}. ${
+      analyticsLine ? `${analyticsLine}. ` : ''
+    }${
+      topAchievements.length
+        ? `Standout wins included ${topAchievements.join(', ')}.`
+        : 'The month would benefit from more logged achievements.'
+    } ${
+      inProgressGoals.length
+        ? `Primary active focus areas remain ${inProgressGoals.slice(0, 3).join(', ')}.`
+        : ''
+    }`.trim()
 
   return {
     summary,
@@ -174,11 +186,14 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient()
-  const bundle = await getEmployeeBundle(payload.data.employeeId)
+  const bundle: any = await getEmployeeBundle(payload.data.employeeId)
   const analytics = await getEmployeeAnalytics(bundle.employee)
   const analyticsNarrative = buildAnalyticsNarrative(analytics)
 
-  const updatesForMonth = bundle.updates.filter((u) => u.month_key === payload.data.monthKey)
+  const updatesForMonth = (bundle.updates ?? []).filter(
+    (u: any) => u.month_key === payload.data.monthKey
+  )
+
   const snapshot: Snapshot = {
     employee: {
       id: bundle.employee.id,
@@ -189,28 +204,35 @@ export async function POST(request: Request) {
       current_quarter_focus: bundle.employee.current_quarter_focus,
       manager_name: bundle.employee.manager_name,
     },
-    goals: bundle.goals.map((goal) => ({
+    goals: (bundle.goals ?? []).map((goal: any) => ({
       title: goal.title,
       description: goal.description,
       status: goal.status,
       success_signal: goal.success_signal,
-      tasks: goal.tasks.map((task) => ({ title: task.title, is_completed: task.is_completed })),
+      tasks: (goal.tasks ?? goal.goal_tasks ?? []).map((task: any) => ({
+        title: task.title,
+        is_completed: task.is_completed,
+      })),
     })),
-    softSkills: bundle.softSkills.map((skill) => ({
+    softSkills: (bundle.softSkills ?? []).map((skill: any) => ({
       skill_name: skill.skill_name,
       status: skill.status,
       current_focus: skill.current_focus,
       description: skill.description,
     })),
-    updates: updatesForMonth.map((u) => ({
+    updates: updatesForMonth.map((u: any) => ({
       month_key: u.month_key,
       update_type: u.update_type,
       content: u.content,
       created_at: u.created_at,
     })),
-    achievements: bundle.achievements
-      .filter((a) => a.achieved_on.startsWith(payload.data.monthKey))
-      .map((a) => ({ title: a.title, description: a.description, achieved_on: a.achieved_on })),
+    achievements: (bundle.achievements ?? [])
+      .filter((a: any) => a.achieved_on?.startsWith(payload.data.monthKey))
+      .map((a: any) => ({
+        title: a.title,
+        description: a.description,
+        achieved_on: a.achieved_on,
+      })),
     analytics: analyticsNarrative,
   }
 
@@ -221,7 +243,7 @@ export async function POST(request: Request) {
       bundle.employee.role_title,
       bundle.employee.performance_classification ?? 'Performance not yet classified',
       bundle.employee.current_quarter_focus ?? 'Quarter focus not yet set',
-      ...(analytics.warnings ?? []).slice(0, 2),
+      ...((analytics?.warnings ?? []) as string[]).slice(0, 2),
     ],
   }
 
@@ -240,7 +262,7 @@ export async function POST(request: Request) {
       generated_by_user_id: appUser.id,
       source_snapshot_json: sourceSnapshot,
     },
-    { onConflict: 'employee_id,month_key' },
+    { onConflict: 'employee_id,month_key' }
   )
 
   if (error) {
