@@ -28,11 +28,12 @@ function SectionCard({
   return (
     <section
       style={{
-        background: 'white',
-        border: '1px solid #e2e8f0',
-        borderRadius: 20,
+        background: 'rgba(255,255,255,0.84)',
+        border: '1px solid #e3edd1',
+        borderRadius: 22,
         padding: 24,
-        boxShadow: '0 10px 30px rgba(15, 23, 42, 0.05)',
+        boxShadow: '0 12px 30px rgba(33, 45, 22, 0.06)',
+        backdropFilter: 'blur(8px)',
         marginBottom: 24,
       }}
     >
@@ -41,13 +42,46 @@ function SectionCard({
           marginTop: 0,
           marginBottom: 18,
           fontSize: 22,
-          color: '#0f172a',
+          color: '#142013',
+          letterSpacing: '-0.02em',
         }}
       >
         {title}
       </h2>
       {children}
     </section>
+  )
+}
+
+function ItemCard({
+  date,
+  content,
+}: {
+  date?: string | null
+  content: string
+}) {
+  return (
+    <div
+      style={{
+        border: '1px solid #e3edd1',
+        borderRadius: 16,
+        padding: 16,
+        background: '#fbfef6',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 13,
+          color: '#70806c',
+          marginBottom: 6,
+        }}
+      >
+        {formatDate(date)}
+      </div>
+      <div style={{ color: '#142013', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+        {content}
+      </div>
+    </div>
   )
 }
 
@@ -63,7 +97,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
     <div
       style={{
         minHeight: '100vh',
-        background: '#f8fafc',
+        background: '#f7faf7',
         padding: '40px 24px',
         fontFamily: 'Inter, Arial, sans-serif',
       }}
@@ -73,7 +107,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
           <Link
             href="/admin"
             style={{
-              color: '#334155',
+              color: '#4e5f49',
               textDecoration: 'none',
               fontWeight: 600,
               fontSize: 14,
@@ -85,12 +119,13 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
 
         <div
           style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            background: 'linear-gradient(135deg, #182415 0%, #24331f 100%)',
             color: 'white',
             borderRadius: 24,
             padding: 28,
             marginBottom: 24,
-            boxShadow: '0 16px 40px rgba(15, 23, 42, 0.18)',
+            boxShadow: '0 16px 40px rgba(20, 32, 19, 0.18)',
+            border: '1px solid rgba(183, 223, 109, 0.18)',
           }}
         >
           <div
@@ -98,7 +133,8 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
               display: 'inline-block',
               padding: '6px 12px',
               borderRadius: 999,
-              background: 'rgba(255,255,255,0.14)',
+              background: 'rgba(223,245,178,0.16)',
+              color: '#eef8d8',
               fontSize: 12,
               fontWeight: 700,
               marginBottom: 14,
@@ -107,7 +143,16 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
             Employee Profile
           </div>
 
-          <h1 style={{ margin: 0, fontSize: 36 }}>{bundle.employee.name}</h1>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 36,
+              letterSpacing: '-0.03em',
+            }}
+          >
+            {bundle.employee.name}
+          </h1>
+
           <p
             style={{
               marginTop: 10,
@@ -134,31 +179,14 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
 
           <div style={{ display: 'grid', gap: 12 }}>
             {bundle.achievements.length === 0 ? (
-              <p style={{ color: '#64748b' }}>No achievements yet.</p>
+              <p style={{ color: '#70806c' }}>No achievements yet.</p>
             ) : (
               bundle.achievements.map((item: any) => (
-                <div
+                <ItemCard
                   key={item.id}
-                  style={{
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 12,
-                    padding: 16,
-                    background: '#fcfcfd',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: '#64748b',
-                      marginBottom: 6,
-                    }}
-                  >
-                    {formatDate(item.created_at)}
-                  </div>
-                  <div style={{ color: '#0f172a' }}>
-                    {item.note || item.content || item.title}
-                  </div>
-                </div>
+                  date={item.created_at}
+                  content={item.note || item.content || item.title || '—'}
+                />
               ))
             )}
           </div>
@@ -171,68 +199,44 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
 
           <div style={{ display: 'grid', gap: 12 }}>
             {bundle.notes.length === 0 ? (
-              <p style={{ color: '#64748b' }}>No notes yet.</p>
+              <p style={{ color: '#70806c' }}>No notes yet.</p>
             ) : (
               bundle.notes.map((item: any) => (
-                <div
+                <ItemCard
                   key={item.id}
-                  style={{
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 12,
-                    padding: 16,
-                    background: '#fcfcfd',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: '#64748b',
-                      marginBottom: 6,
-                    }}
-                  >
-                    {formatDate(item.created_at)}
-                  </div>
-                  <div style={{ color: '#0f172a' }}>
-                    {item.note || item.content || item.title}
-                  </div>
-                </div>
+                  date={item.created_at}
+                  content={item.note || item.content || item.title || '—'}
+                />
               ))
             )}
           </div>
         </SectionCard>
-<SectionCard title="Monthly Summaries">
-  <div style={{ marginBottom: 18 }}>
-    <GenerateSummaryButton employeeId={bundle.employee.id} />
-  </div>
 
-  <div style={{ display: 'grid', gap: 12 }}>
-    {bundle.summaries.length === 0 ? (
-      <p style={{ color: '#64748b' }}>No summaries yet.</p>
-    ) : (
-      bundle.summaries.map((item: any) => (
-        <div
-          key={item.id}
-          style={{
-            border: '1px solid #e2e8f0',
-            borderRadius: 12,
-            padding: 16,
-            background: '#fcfcfd',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 13,
-              color: '#64748b',
-              marginBottom: 6,
-            }}
-          >
-            {formatDate(item.created_at)}
+        <SectionCard title="Monthly Summaries">
+          <div style={{ marginBottom: 18 }}>
+            <GenerateSummaryButton employeeId={bundle.employee.id} />
           </div>
-          <div style={{ whiteSpace: 'pre-wrap', color: '#0f172a' }}>
-            {item.summary_text || item.summary || item.content || JSON.stringify(item)}
+
+          <div style={{ display: 'grid', gap: 12 }}>
+            {bundle.summaries.length === 0 ? (
+              <p style={{ color: '#70806c' }}>No summaries yet.</p>
+            ) : (
+              bundle.summaries.map((item: any) => (
+                <ItemCard
+                  key={item.id}
+                  date={item.created_at}
+                  content={
+                    item.summary_text ||
+                    item.summary ||
+                    item.content ||
+                    JSON.stringify(item)
+                  }
+                />
+              ))
+            )}
           </div>
-        </div>
-      ))
-    )}
-  </div>
-</SectionCard>
+        </SectionCard>
+      </div>
+    </div>
+  )
+}

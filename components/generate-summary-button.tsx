@@ -42,12 +42,13 @@ export default function GenerateSummaryButton({
       disabled={loading}
       style={{
         padding: '10px 16px',
-        borderRadius: 10,
-        border: 'none',
-        background: '#0f172a',
-        color: 'white',
-        fontWeight: 600,
+        borderRadius: 12,
+        border: '1px solid #b7df6d',
+        background: '#dff5b2',
+        color: '#142013',
+        fontWeight: 700,
         cursor: 'pointer',
+        boxShadow: '0 6px 18px rgba(183, 223, 109, 0.18)',
       }}
     >
       {loading ? 'Generating...' : 'Generate Monthly Summary'}
