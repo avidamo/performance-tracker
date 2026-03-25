@@ -97,6 +97,30 @@ export async function addAchievement(employeeId: string, note: string) {
   })
 }
 
+// DELETE GOAL
+export async function deleteGoal(goalId: string) {
+  const supabase = await createClient()
+  return supabase.from('goals').delete().eq('id', goalId)
+}
+
+// DELETE TASK
+export async function deleteTask(taskId: string) {
+  const supabase = await createClient()
+  return supabase.from('goal_tasks').delete().eq('id', taskId)
+}
+
+// DELETE NOTE
+export async function deleteNote(noteId: string) {
+  const supabase = await createClient()
+  return supabase.from('manager_notes').delete().eq('id', noteId)
+}
+
+// DELETE ACHIEVEMENT
+export async function deleteAchievement(achievementId: string) {
+  const supabase = await createClient()
+  return supabase.from('achievements').delete().eq('id', achievementId)
+}
+
 // GET CURRENT APP USER
 export async function getCurrentAppUser() {
   const supabase = await createClient()

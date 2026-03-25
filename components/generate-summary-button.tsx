@@ -1,36 +1,56 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 
-export function GenerateSummaryButton({ employeeId }: { employeeId: string }) {
-  const [pending, startTransition] = useTransition()
-  const [message, setMessage] = useState<string | null>(null)
+export default function GenerateSummaryButton({
+  employeeId,
+}: {
+  employeeId: string
+}) {
+  const [loading, setLoading] = useState(false)
 
-  async function generate() {
-    setMessage(null)
+  async function handleGenerate() {
     const monthKey = new Date().toISOString().slice(0, 7)
+
+    setLoading(true)
+
     const response = await fetch('/api/generate-summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employeeId, monthKey }),
+      body: JSON.stringify({
+        employeeId,
+        monthKey,
+      }),
     })
 
     const result = await response.json()
+    setLoading(false)
 
     if (!response.ok) {
-      setMessage(result.error ?? 'Failed to generate summary.')
+      alert(result.error || 'Could not generate summary')
       return
     }
 
-    setMessage('Summary generated. Refresh to see the latest version and manager highlights.')
+    alert('Monthly summary generated')
+    window.location.reload()
   }
 
   return (
-    <div className="row-gap">
-      <button className="button" onClick={() => startTransition(generate)} type="button">
-        {pending ? 'Generating...' : 'Generate monthly summary'}
-      </button>
-      {message ? <span className="muted">{message}</span> : null}
-    </div>
+    <button
+      type="button"
+      onClick={handleGenerate}
+      disabled={loading}
+      style={{
+        padding: '10px 16px',
+        borderRadius: 10,
+        border: 'none',
+        background: '#0f172a',
+        color: 'white',
+        fontWeight: 600,
+        cursor: 'pointer',
+      }}
+    >
+      {loading ? 'Generating...' : 'Generate Monthly Summary'}
+    </button>
   )
 }
