@@ -62,7 +62,7 @@ export async function addTask(goalId: string, title: string) {
   return supabase.from('goal_tasks').insert({
     goal_id: goalId,
     title,
-    completed: false
+    completed: false,
   })
 }
 
@@ -73,7 +73,7 @@ export async function addGoal(employeeId: string, title: string) {
   return supabase.from('goals').insert({
     employee_id: employeeId,
     title,
-    status: 'active'
+    status: 'active',
   })
 }
 
@@ -83,7 +83,7 @@ export async function addNote(employeeId: string, note: string) {
 
   return supabase.from('manager_notes').insert({
     employee_id: employeeId,
-    note
+    note,
   })
 }
 
@@ -93,7 +93,7 @@ export async function addAchievement(employeeId: string, note: string) {
 
   return supabase.from('achievements').insert({
     employee_id: employeeId,
-    note
+    note,
   })
 }
 
@@ -114,35 +114,48 @@ export async function getCurrentAppUser() {
 
   return employee
 }
+
+// GET EMPLOYEE BUNDLE
 export async function getEmployeeBundle(employeeId: string) {
   const supabase = await createClient()
 
-  const [{ data: employee }, { data: goals }, { data: achievements }, { data: notes }, { data: summaries }] =
-    await Promise.all([
-      supabase.from('employees').select('*').eq('id', employeeId).single(),
-      supabase
-        .from('goals')
-        .select(`
-          *,
-          goal_tasks (*)
-        `)
-        .eq('employee_id', employeeId),
-      supabase
-        .from('achievements')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('manager_notes')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('monthly_summaries')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .order('created_at', { ascending: false }),
-    ])
+  const [
+    { data: employee },
+    { data: goals },
+    { data: achievements },
+    { data: notes },
+    { data: summaries },
+    { data: updates },
+  ] = await Promise.all([
+    supabase.from('employees').select('*').eq('id', employeeId).single(),
+    supabase
+      .from('goals')
+      .select(`
+        *,
+        goal_tasks (*)
+      `)
+      .eq('employee_id', employeeId),
+    supabase
+      .from('achievements')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('manager_notes')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('monthly_summaries')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('progress_updates')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .order('created_at', { ascending: false }),
+  ])
 
   return {
     employee: employee ?? null,
@@ -150,5 +163,6 @@ export async function getEmployeeBundle(employeeId: string) {
     achievements: achievements ?? [],
     notes: notes ?? [],
     summaries: summaries ?? [],
+    updates: updates ?? [],
   }
 }
