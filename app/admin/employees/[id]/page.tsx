@@ -85,10 +85,11 @@ function ItemCard({
   )
 }
 
-function PortfolioProgressCard({
-  goal,
-  current,
-  employeeId,
+<PortfolioProgressCard
+  goal={bundle.employee.portfolio_goal}
+  current={bundle.employee.portfolio_current}
+  employeeId={bundle.employee.id}
+  />
 }: {
   goal?: number | null
   current?: number | null
@@ -218,12 +219,14 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const staticGoals =
-    employeeGoals.find(
-      (entry) =>
-        entry.name.toLowerCase().trim() ===
-        String(bundle.employee.name || '').toLowerCase().trim()
-    )?.goals ?? []
+ const employeeConfig = employeeGoals.find(
+  (entry) =>
+    entry.name.toLowerCase().trim() ===
+    String(bundle.employee.name || '').toLowerCase().trim()
+)
+
+const staticGoals = employeeConfig?.goals ?? []
+const staticPortfolioGoal = employeeConfig?.portfolioGoal ?? null
 
   return (
     <div

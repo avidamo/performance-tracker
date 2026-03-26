@@ -1,6 +1,7 @@
 export const employeeGoals = [
   {
     name: "Jordan",
+    portfolioGoal: 100000,
     goals: [
       {
         title: "Elevate executive-level communication and strategic clarity",
@@ -27,6 +28,7 @@ export const employeeGoals = [
   },
   {
     name: "Eugene",
+    portfolioGoal: 100000,
     goals: [
       {
         title: "Build a scalable data-driven CAM system",
@@ -53,6 +55,7 @@ export const employeeGoals = [
   },
   {
     name: "Elissa",
+    portfolioGoal: 100000,
     goals: [
       {
         title: "Build strong data fluency for decision-making",
@@ -80,6 +83,7 @@ export const employeeGoals = [
   },
   {
     name: "Peri",
+    portfolioGoal: 150000,
     goals: [
       {
         title: "Build consistent visibility and communication habits",
@@ -100,14 +104,14 @@ export const employeeGoals = [
         actions: [
           "Dedicate 1 hour/week to outreach",
           "Improve analytical communication with coaches",
-          "Grow to all Level 4 coaches",
-          "Portfolio target: $130K–$150K/month"
+          "Grow to all Level 4 coaches"
         ]
       }
     ]
   },
   {
     name: "Begai",
+    portfolioGoal: 100000,
     goals: [
       {
         title: "Build consistent execution through calendar structure",
@@ -136,6 +140,7 @@ export const employeeGoals = [
   },
   {
     name: "Steph",
+    portfolioGoal: 100000,
     goals: [
       {
         title: "Develop full autonomy in decision-making",

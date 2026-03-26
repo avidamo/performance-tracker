@@ -135,10 +135,11 @@ export default async function EmployeePage({ params }: PageProps) {
               Portfolio Goal
             </div>
 
-            <PortfolioBar
-              goal={bundle.employee.portfolio_goal}
-              current={bundle.employee.portfolio_current}
-            />
+  <PortfolioBar
+  goal={staticPortfolioGoal ?? bundle.employee.portfolio_goal}
+  current={bundle.employee.portfolio_current}
+/>
+
           </div>
         </div>
 
