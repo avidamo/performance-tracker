@@ -189,4 +189,68 @@ export async function getEmployeeBundle(employeeId: string) {
     summaries: summaries ?? [],
     updates: updates ?? [],
   }
+}export async function getEmployeeBundleByAccessToken(token: string) {
+  const supabase = await createClient()
+
+  const { data: employee } = await supabase
+    .from('employees')
+    .select('*')
+    .eq('employee_access_token', token)
+    .single()
+
+  if (!employee) {
+    return {
+      employee: null,
+      goals: [],
+      achievements: [],
+      notes: [],
+      summaries: [],
+      updates: [],
+    }
+  }
+
+  const [
+    { data: goals },
+    { data: achievements },
+    { data: notes },
+    { data: summaries },
+    { data: updates },
+  ] = await Promise.all([
+    supabase
+      .from('goals')
+      .select(`
+        *,
+        goal_tasks (*)
+      `)
+      .eq('employee_id', employee.id),
+    supabase
+      .from('achievements')
+      .select('*')
+      .eq('employee_id', employee.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('manager_notes')
+      .select('*')
+      .eq('employee_id', employee.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('monthly_summaries')
+      .select('*')
+      .eq('employee_id', employee.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('progress_updates')
+      .select('*')
+      .eq('employee_id', employee.id)
+      .order('created_at', { ascending: false }),
+  ])
+
+  return {
+    employee,
+    goals: goals ?? [],
+    achievements: achievements ?? [],
+    notes: notes ?? [],
+    summaries: summaries ?? [],
+    updates: updates ?? [],
+  }
 }

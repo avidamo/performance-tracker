@@ -85,11 +85,10 @@ function ItemCard({
   )
 }
 
-<PortfolioProgressCard
-  goal={bundle.employee.portfolio_goal}
-  current={bundle.employee.portfolio_current}
-  employeeId={bundle.employee.id}
-  />
+function PortfolioProgressCard({
+  goal,
+  current,
+  employeeId,
 }: {
   goal?: number | null
   current?: number | null
@@ -200,6 +199,10 @@ function ItemCard({
           : 'Goal reached'}
       </div>
 
+      <div style={{ marginTop: 8, fontSize: 13, color: '#70806c' }}>
+        Monthly pace: ${Math.round(safeCurrent / Math.max(new Date().getDate(), 1)).toLocaleString()}/day
+      </div>
+
       <div style={{ marginTop: 12 }}>
         <PortfolioEditor
           employeeId={employeeId}
@@ -219,14 +222,17 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
     notFound()
   }
 
- const employeeConfig = employeeGoals.find(
-  (entry) =>
-    entry.name.toLowerCase().trim() ===
-    String(bundle.employee.name || '').toLowerCase().trim()
-)
+  const employeeConfig = employeeGoals.find((entry) => {
+    const firstName = String(bundle.employee.name || '')
+      .toLowerCase()
+      .trim()
+      .split(' ')[0]
 
-const staticGoals = employeeConfig?.goals ?? []
-const staticPortfolioGoal = employeeConfig?.portfolioGoal ?? null
+    return entry.name.toLowerCase().trim() === firstName
+  })
+
+  const staticGoals = employeeConfig?.goals ?? []
+  const staticPortfolioGoal = employeeConfig?.portfolioGoal ?? null
 
   return (
     <div
@@ -301,7 +307,7 @@ const staticPortfolioGoal = employeeConfig?.portfolioGoal ?? null
         </div>
 
         <PortfolioProgressCard
-          goal={bundle.employee.portfolio_goal}
+          goal={staticPortfolioGoal ?? bundle.employee.portfolio_goal}
           current={bundle.employee.portfolio_current}
           employeeId={bundle.employee.id}
         />
