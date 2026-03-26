@@ -200,7 +200,9 @@ function PortfolioProgressCard({
       </div>
 
       <div style={{ marginTop: 8, fontSize: 13, color: '#70806c' }}>
-        Monthly pace: ${Math.round(safeCurrent / Math.max(new Date().getDate(), 1)).toLocaleString()}/day
+        Monthly pace: $
+        {Math.round(safeCurrent / Math.max(new Date().getDate(), 1)).toLocaleString()}
+        /day
       </div>
 
       <div style={{ marginTop: 12 }}>
@@ -222,11 +224,14 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const employeeConfig = employeeGoals.find(
-    (entry) =>
-      entry.name.toLowerCase().trim() ===
-      String(bundle.employee.name || '').toLowerCase().trim()
-  )
+  const employeeConfig = employeeGoals.find((entry) => {
+    const firstName = String(bundle.employee.name || '')
+      .toLowerCase()
+      .trim()
+      .split(' ')[0]
+
+    return entry.name.toLowerCase().trim() === firstName
+  })
 
   const staticGoals = employeeConfig?.goals ?? []
   const staticPortfolioGoal = employeeConfig?.portfolioGoal ?? null
