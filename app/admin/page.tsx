@@ -13,12 +13,13 @@ export default async function AdminPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#f7faf7',
+        background: '#f3fbe8',
         padding: '40px 24px',
         fontFamily: 'Inter, Arial, sans-serif',
       }}
     >
       <div style={{ maxWidth: 1150, margin: '0 auto' }}>
+        {/* HEADER */}
         <div style={{ marginBottom: 28 }}>
           <div
             style={{
@@ -33,7 +34,7 @@ export default async function AdminPage() {
               border: '1px solid #b7df6d',
             }}
           >
-            CAM Performance Tracker
+            CAM Growth Vault
           </div>
 
           <h1
@@ -55,10 +56,11 @@ export default async function AdminPage() {
               fontSize: 16,
             }}
           >
-            Track employee goals, notes, achievements, and monthly summaries in one place.
+            Track performance, coach growth, and portfolio progress across CAMs.
           </p>
         </div>
 
+        {/* STATS */}
         <div
           style={{
             display: 'grid',
@@ -72,6 +74,7 @@ export default async function AdminPage() {
           <StatCard label="Placeholders" value={placeholders.length} />
         </div>
 
+        {/* EMPLOYEE CARDS */}
         <div
           style={{
             display: 'grid',
@@ -83,14 +86,14 @@ export default async function AdminPage() {
             <div
               key={employee.id}
               style={{
-                background: 'rgba(255,255,255,0.88)',
+                background: 'rgba(255,255,255,0.9)',
                 border: '1px solid #e3edd1',
-                borderRadius: 22,
+                borderRadius: 20,
                 padding: 22,
                 boxShadow: '0 12px 30px rgba(33, 45, 22, 0.06)',
-                backdropFilter: 'blur(8px)',
               }}
             >
+              {/* NAME */}
               <div style={{ marginBottom: 14 }}>
                 <h2
                   style={{
@@ -115,6 +118,7 @@ export default async function AdminPage() {
                 </p>
               </div>
 
+              {/* TAGS */}
               <div
                 style={{
                   display: 'flex',
@@ -161,6 +165,7 @@ export default async function AdminPage() {
                 )}
               </div>
 
+              {/* ACTIONS */}
               <div
                 style={{
                   display: 'flex',
@@ -172,16 +177,28 @@ export default async function AdminPage() {
                   href={`/admin/employees/${employee.id}`}
                   style={primaryButton}
                 >
-                  Open manager view
+                  Manager view
                 </Link>
 
                 <Link
-                  href={`/employee/${employee.id}`}
+                  href={`/employee-access/${employee.employee_access_token}`}
                   target="_blank"
                   style={secondaryButton}
                 >
-                  View employee page
+                  Employee view
                 </Link>
+
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/employee-access/${employee.employee_access_token}`
+                    )
+                    alert('Link copied')
+                  }}
+                  style={secondaryButton}
+                >
+                  Copy link
+                </button>
               </div>
             </div>
           ))}
@@ -201,7 +218,7 @@ function StatCard({
   return (
     <div
       style={{
-        background: 'rgba(255,255,255,0.82)',
+        background: 'rgba(255,255,255,0.9)',
         border: '1px solid #e3edd1',
         borderRadius: 20,
         padding: 20,
