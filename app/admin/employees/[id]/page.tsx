@@ -1,30 +1,13 @@
-<Link
-  href={`/employee/${bundle.employee.id}`}
-  target="_blank"
-  style={{
-    display: 'inline-block',
-    marginBottom: 20,
-    padding: '8px 14px',
-    borderRadius: 10,
-    background: '#dff5b2',
-    color: '#142013',
-    fontWeight: 600,
-    textDecoration: 'none',
-  }}
->
-  View as Employee →
-</Link>
-
 import GenerateSummaryButton from '@/components/generate-summary-button'
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEmployeeBundle } from '@/lib/data'
-import TaskCheckboxList from '@/components/task-checkbox-list'
+import { employeeGoals } from '@/lib/employee-goals'
 import AddNoteForm from '@/components/add-note-form'
 import AddAchievementForm from '@/components/add-achievement-form'
-import AddGoalForm from '@/components/add-goal-form'
+import PortfolioEditor from '@/components/portfolio-editor'
 
 type PageProps = {
   params: Promise<{ id: string }>
@@ -102,6 +85,131 @@ function ItemCard({
   )
 }
 
+function PortfolioProgressCard({
+  goal,
+  current,
+  employeeId,
+}: {
+  goal?: number | null
+  current?: number | null
+  employeeId: string
+}) {
+  const safeGoal = Number(goal || 0)
+  const safeCurrent = Number(current || 0)
+  const percent = safeGoal > 0 ? Math.min((safeCurrent / safeGoal) * 100, 100) : 0
+  const remaining = Math.max(safeGoal - safeCurrent, 0)
+
+  let fill = '#f59e0b'
+  let bg = '#fff7e6'
+  let text = '#6b4f00'
+
+  if (percent < 60) {
+    fill = '#ef4444'
+    bg = '#fef2f2'
+    text = '#7f1d1d'
+  } else if (percent >= 85) {
+    fill = '#b7df6d'
+    bg = '#f3fbe8'
+    text = '#2f4a12'
+  }
+
+  return (
+    <div
+      style={{
+        background: bg,
+        border: `1px solid ${fill}55`,
+        borderRadius: 22,
+        padding: 22,
+        marginBottom: 24,
+        boxShadow: '0 10px 24px rgba(33, 45, 22, 0.05)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 16,
+          flexWrap: 'wrap',
+          marginBottom: 14,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: text,
+              marginBottom: 6,
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            Portfolio Goal
+          </div>
+          <div
+            style={{
+              fontSize: 30,
+              fontWeight: 800,
+              color: '#142013',
+              letterSpacing: '-0.03em',
+            }}
+          >
+            ${safeCurrent.toLocaleString()} / ${safeGoal.toLocaleString()}
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: '8px 12px',
+            borderRadius: 999,
+            background: 'white',
+            border: '1px solid #e5e7eb',
+            fontWeight: 700,
+            color: text,
+          }}
+        >
+          {percent.toFixed(0)}% to goal
+        </div>
+      </div>
+
+      <div
+        style={{
+          height: 14,
+          borderRadius: 999,
+          background: 'rgba(255,255,255,0.8)',
+          overflow: 'hidden',
+          marginBottom: 12,
+        }}
+      >
+        <div
+          style={{
+            width: `${percent}%`,
+            height: '100%',
+            background: fill,
+            borderRadius: 999,
+            transition: 'width 300ms ease',
+          }}
+        />
+      </div>
+
+      <div style={{ color: '#5f6b5f', fontSize: 14 }}>
+        {remaining > 0
+          ? `$${remaining.toLocaleString()} remaining to hit goal`
+          : 'Goal reached'}
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <PortfolioEditor
+          employeeId={employeeId}
+          goal={safeGoal}
+          current={safeCurrent}
+        />
+      </div>
+    </div>
+  )
+}
+
 export default async function EmployeeDetailPage({ params }: PageProps) {
   const { id } = await params
   const bundle = await getEmployeeBundle(id)
@@ -109,6 +217,13 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
   if (!bundle.employee) {
     notFound()
   }
+
+  const staticGoals =
+    employeeGoals.find(
+      (entry) =>
+        entry.name.toLowerCase().trim() ===
+        String(bundle.employee.name || '').toLowerCase().trim()
+    )?.goals ?? []
 
   return (
     <div
@@ -182,11 +297,60 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
           </p>
         </div>
 
+        <PortfolioProgressCard
+          goal={bundle.employee.portfolio_goal}
+          current={bundle.employee.portfolio_current}
+          employeeId={bundle.employee.id}
+        />
+
         <SectionCard title="Goals & Action Plan">
-          <div style={{ marginBottom: 20 }}>
-            <AddGoalForm employeeId={bundle.employee.id} />
+          <div style={{ display: 'grid', gap: 18 }}>
+            {staticGoals.length === 0 ? (
+              <p style={{ color: '#70806c' }}>No goals yet.</p>
+            ) : (
+              staticGoals.map((goal, index) => (
+                <div
+                  key={`${goal.title}-${index}`}
+                  style={{
+                    background: '#fbfef6',
+                    border: '1px solid #dfe8cd',
+                    borderRadius: 20,
+                    padding: 20,
+                    boxShadow: '0 10px 24px rgba(34, 45, 22, 0.05)',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 18,
+                      color: '#142013',
+                      marginBottom: 10,
+                    }}
+                  >
+                    {goal.title}
+                  </div>
+
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    {goal.actions.map((action, actionIndex) => (
+                      <div
+                        key={`${goal.title}-${actionIndex}`}
+                        style={{
+                          color: '#5f6b5f',
+                          lineHeight: 1.5,
+                          background: 'white',
+                          border: '1px solid #e7efd7',
+                          borderRadius: 14,
+                          padding: '12px 14px',
+                        }}
+                      >
+                        • {action}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-          <TaskCheckboxList goals={bundle.goals} />
         </SectionCard>
 
         <SectionCard title="Achievements">
