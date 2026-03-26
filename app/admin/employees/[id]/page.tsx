@@ -1,3 +1,20 @@
+<Link
+  href={`/employee/${bundle.employee.id}`}
+  target="_blank"
+  style={{
+    display: 'inline-block',
+    marginBottom: 20,
+    padding: '8px 14px',
+    borderRadius: 10,
+    background: '#dff5b2',
+    color: '#142013',
+    fontWeight: 600,
+    textDecoration: 'none',
+  }}
+>
+  View as Employee →
+</Link>
+
 import GenerateSummaryButton from '@/components/generate-summary-button'
 export const dynamic = 'force-dynamic'
 
